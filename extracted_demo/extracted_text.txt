@@ -1,0 +1,1713 @@
+
+============================================================
+第 1 页
+============================================================
+25年11月 VLA泊车-HMI交互需求V1.0 [最
+终]​
+需求来源
+时间​
+来源文档​
+需求链接​
+2025.11.1
+7​
+​
+丁锐博​
+功能规范：​
+​
+泊车HAVP_HMI交互规范
+_V1.0_20251118.pdf
+TTS播报表：​
+​
+智驾-（泊车）TTS语音播报-需求输入-
+V5.1【修复】.xlsx
+语音控车指令：​
+VLA漫游泊车指令_202511​
+PB规范及proto:​
+parking_sr_protobuf-
+v1.6.5.rar
+7.43MB
+2026.1.16​
+​
+卢林春​
+问题背景：解决地图匹配上后漫游预激活界面和2D地图
+界面频繁跳闪问题​
+变更1：漫游激活退出全退到HUT主界面​
+详见文档4.5 漫游异常退出​
+问题背景：解决静默建图保存弹窗显示时间过短问题​
+变更2：弹窗发送15s 。
+PopupDisp=0X3F:HAVP_Push_Request（最长10s  
+15s）​
+详见文档4.6静默&漫游完成​
+变更3：HAVPFunctTextDisp =0x2E: Park--in Cruising 
+原来记忆泊车巡航的常驻文言,改成  0xC4 ：HAVP 
+Roaming  "车辆漫游中，请注意周围环境"​
+2026.1.22​
+丁锐博在巡航和2D地图管理页面显示充电桩车位属
+性​
+​
+[研发需求（RR）]
+【VLA泊车】充电桩车位
+属性增加​
+需求描述
+Zhiyuan Chen 1月19日 14:36
+问题背景：解决地图匹配上后漫游预激活…
+@Qian Wang  这块用例需要更
+新一下
+评论（16）
+
+
+============================================================
+第 2 页
+============================================================
+1. 平台配置​
+HUT需识别ADC40平台配置字，进行VLA漫游泊车功能相关逻辑的显示。 ​
+2. 功能开启​
+VLA漫游泊车功能开启方式分为无图漫游功能开启和有图泊车功能开启。​
+状态灯​
+状态灯信号(CAN信号）​
+状态灯样式​
+无图漫游待激活​
+PrkgFuncStsLmp=0x2:VLAP_Roa
+ming_Standby​
+无图漫游​
+PrkgFuncStsLmp= 
+0x4:VLAP_Roaming_Active​
+漫游过程中油门
+override​
+漫游状态灯高亮闪烁​
+PrkgFuncStsLmp= 
+0x6:VLAP_Crusing_Override​
+有图巡航待激活​
+PrkgFuncStsLmp=0x7:HAVP_Sta
+ndby​
+有图巡航已激活​
+PrkgFuncStsLmp=0x8:HAVP_Acti
+ve​
+有图巡航踩油门​
+PrkgFuncStsLmp=0x9:HAVP_Ov
+erride​
+2.1 无图漫游功能开启​
+漫游功能开启有三种方式：语音激活，用户软按键激活以及主动推送（预留）。使用场
+景主要有：引导界面、无目的漫游、有目的漫游以及主动推送。
+Signal
+_Indn
+c​
+功能
+开启​
+前置条
+件​
+Interfac
+eDisTyp​
+界面信息​
+示意图​
+0x1:S
+OME/I
+P​
+/​
+ODD范
+围外，
+点击进
+入功能
+软按键
+或者语
+音激活​
+0xF:VLAP
+ without 
+ODD​
+无图引导界面​
+•
+弹窗推送”记忆泊车
+已就绪，下拨两次拨
+杆或试试语音激
+活”，持续10s
+（TBD）​
+Zhiyuan Chen 2025年12月26日
+PrkgFuncStsLmp= 0x6:VLAP_Crusing_…
+@Kang Liang  
+@Zengrui Meng  
+@Jinchen Zou  新增信号
+丁锐博2025年11月22日
+及主动推送。
+暂无主动推送
+Zhiyuan Chen 1月15日 15:20
+[图片]
+UI 更新了。用例也更新一下
+@Qian Wang
+丁锐博2025年11月22日
+当前实车车速
+
+
+============================================================
+第 3 页
+============================================================
+无图
+静默
+建图-
+-人驾​
+ODD范
+围内，
+用户点
+击【记
+忆泊
+车】按
+键进入
+到漫游
+泊车人
+驾界面​
+•
+无
+图
+引
+导
+界
+面
+进
+入
+OD
+D
+范
+围
+内
+自
+动
+跳
+转​
+0x10:VLA
+P 
+Preactiv
+e​
+漫游泊车人驾界面​
+1. 在APA泊车或R挡或转
+向等自动悬浮显示
+360全景影像视图
+（复用记忆泊车视频
+展示）​
+2. 自车车模​
+3. 当前实车车速（实际
+为档位信息）​
+4. 漫游标识置灰 ，
+PrkgFuncStsLmp=0
+x2:VLAP_Roaming_
+Standby​
+5. 实时感知元素的渲
+染，至少包括立柱、
+车位、道路箭头、行
+人、车辆、减速带、
+学习的轨迹​
+6. 显示缩略态Map，小
+地图不可展开，点击
+进行文言提示“请保
+存地图后再尝试”​
+无图
+漫游
+泊车-
+-智驾​
+ODD范
+围内，
+用户语
+音激活
+或人驾
+界面下
+下拨拨
+杆​
+0x11:VLA
+P   
+Active 
+Page​
+ ​
+漫游控车界面​
+1. 在APA泊车或R挡或转
+向等自动悬浮显示
+360全景影像视图
+（复用记忆泊车视频
+展示）​
+2. 在主页面显示缩略态
+实时路线，小地图不
+可展开，点击进行文
+言提示“请保存地图
+后再尝试”；​
+3. 显示自车位置；​
+4. 显示实时感知的障碍
+物信息、车位信息，
+历史轨迹、规划路径
+信息；​
+5. 显示最大车速和实际
+车速；漫游泊车速度
+设置反馈信号：
+VLAPSpdSetVal=0x1
+4:Twenty（支持设置
+范围：10~20km/h）​
+6. 根据
+HAVPFunctTextDisp
+提示用户文字；​
+7. 显示退出按键​
+8. 漫游标识高亮​
+丁锐博2025年11月22日
+当期车速HUT 无法实现，实际
+按照档位信息做
+Qian Chen 2025年12月17日
+Zhiyuan Chen 2025年12月17日
+道路箭头
+这个是指地面的方向箭头？
+是的，地面标识
+Qian Chen 2025年12月17日
+Zhiyuan Chen 2025年12月17日
+小地图不可展开
+小地图显示的信息具体有哪些？
+小地图不加了
+
+
+============================================================
+第 4 页
+============================================================
+9. 【沿途泊车】按键
+AlongToutPrkgBtnS
+ts​
+10. COT面板​
+2.1.1 无目的漫游​
+前提条件：域控判断满足功能开启
+触发条件：语音直接激活漫游泊车、软按键点击【记忆泊车】按键后双击拨杆
+语音激活方式参考《语音控车交互方案文档》
+系统动作：
+1. 用户点击【记忆泊车】软按键 ,HUT发送BtnEnaReq=0x2:Active_signal，域控收到按
+键请求后反馈界面信号InterfaceDisTyp =0x10:VLAP Preactive给到HUT，HUT显示漫
+游泊车人驾界面，该界面支持用户选车位。
+参考记忆泊车地图创建的APA选车位。​
+用户踩制动致车辆刹停，HUT在界面上显示8（TBD）个可泊入车位，其中高亮一个最
+近的车位作为APA目标车位，目标车位支持车头车尾选择，此时用户可以在HUT上点击
+其他可泊入车位或语音选择其他车位，HUT发送SelNearSlotID，泊车控制器收到后更
+改该车位的状态为高亮。
+泊车控制器发送FunctBtnDisp=0x5:Start_APA，HUT界面显示【开始泊车】按键，用
+户语音或点击【开始泊车】按键，HUT发送BtnEnaReq= 
+0x6:Confrim_start_parking。泊车控制器收到后开始横纵向执行器握手，激活APA。​
+2. 在漫游泊车人驾界面InterfaceDisTyp =0x10:VLAP Preactive内，用户通过拨杆或者语
+音激活漫游泊车，域控发送InterfaceDisTyp =0x11: VLAP Active Page，HUT显示漫
+游泊车控车界面。
+2.1.2 有目的漫游​
+前置条件：在InterfaceDisTyp =0x10:VLAP Preactive（漫游泊车人驾界面）界面下，语
+言命中“帮我驶离停车场/停车楼”、“帮我停到/寻找/去B1层”等用户语音，可支持在
+未进功能界面前（领航桌面）激活漫游功能，域控发送InterfaceDisTyp =0x11: VLAP 
+Active Page，HUT显示漫游泊车控车界面。​
+3. 主动推送（预留）
+域控判断满足功能开启条件后，发送PopupDisp =  0x4E:VLAP Roaming Push_Request
+给到HUT，HUT根据此信号渲染漫游可用弹窗，（时长？？？），用户可通过双击拨杆
+或语音激活漫游功能。
+2.2 有图泊车功能开启​
+Sign
+al_I
+ndn
+c​
+功能
+开启​
+前置条件​
+InterfaceDi
+sTyp​
+显示界面​
+示意图​
+0x1:
+SOM
+E/IP​
+0x0:None​
+N.A.​
+   /​
+ODD范围
+外，点击
+【记忆泊
+车】按键或
+语音激活​
+0xF:VLAP 
+without 
+ODD​
+无图引导界面​
+Zhiyuan Chen 2025年11月19日
+Zhiyuan Chen 2025年11月19日
+丁锐博2025年11月22日
+丁锐博2025年11月22日
+可支持在未进功能界面前激活漫游功能
+无图引导界面不能语音激活吗？
+能的话不就和漫游泊车人驾界面
+下这个前提条件矛盾了？
+@Zhiyuan Chen  无图引导界面
+只会在ODD 范围外显示
+@Zhiyuan Chen  指的是进入
+了ODD 范围内，但是没有点击
+【记忆泊车】按键进入功能时
+
+
+============================================================
+第 5 页
+============================================================
+有图
+漫游
+泊车--
+智驾​
+ODD范围
+内，语音指
+令未命中已
+有信息
+（例“帮我
+停到/寻找/
+去B1层”）
+或双击拨杆
+无默认车位​
+0x11:VLAP   
+Active Page​
+ ​
+漫游控车界面​
+1. 在APA泊车或R挡或转
+向等自动悬浮显示360
+全景影像视图（复用记
+忆泊车视频展示）​
+2. 在主页面显示缩略态实
+时路线，小地图不可展
+开，点击进行文言提
+示“请保存地图后再尝
+试”；​
+3. 显示自车位置；​
+4. 显示实时感知的障碍物
+信息、车位信息，学习
+轨迹、规划路径信息；​
+5. 显示最大车速和实际车
+速；漫游泊车速度设置
+反馈信号：
+VLAPSpdSetVal=0x14:
+Twenty（支持设置范
+围：10~20km/h）​
+6. 根据
+HAVPFunctTextDisp提
+示用户文字；​
+7. 显示退出按键​
+8. 漫游标识高亮​
+9. 【沿途泊车】按键
+AlongToutPrkgBtnSts​
+10. COT面板​
+有图
+巡航&
+导航--
+激活
+功能
+界面​
+ODD范围
+内，用户点
+击【记忆泊
+车】软按键​
+•
+无图引
+导界面
+进入
+ODD范
+围内自
+动跳转​
+0x1: 
+Pre_Mapbui
+lt​
+2D库位管理界面​
+1. 渲染逻辑同记忆泊车​
+2. 【开始记忆泊车】按键
+信号
+StartPrkBtnDisp=0x1:
+Available || 
+0x2:Unavailable​
+有图
+巡航--
+智驾
+开启​
+ODD范围
+内，用户双
+击拨杆（存
+在默认车
+位）或与语
+音命中POI
+点​
+0x3:Cruise​
+记忆巡航激活界面​
+1. 渲染逻辑同记忆泊车​
+2. 显示最大车速和实际车
+速；漫游泊车速度设置
+反馈信号：
+VLAPSpdSetVal=0x14:
+Twenty（支持设置范
+围：10~20km/h）​
+3. 巡航标识高亮​
+前置条件：停车场有图且有默认车位或地图点选车位或目的地POI​
+触发条件及系统动作：
+•
+双击拨杆：激活巡航功能（优先执行目标车位）
+
+
+============================================================
+第 6 页
+============================================================
+•
+语音激活：
+◦
+语音命中地图上已有信息（默认车位，出入口POI点，充电桩车位（多个则按照最
+近规划，提升项））（例如“帮我泊入默认车位”），激活巡航功能。
+◦
+语音未命中已有信息（例“帮我停到/寻找/去B1层”），激活漫游泊车功能。​
+•
+软按键激活：点击【开始记忆泊车】，激活巡航功能。
+主动推送：当系统满足开启条件，域控发送PopupDisp=0x4F:VLAP Crusing 
+Push_Request，HUT弹窗提示园区记忆泊车巡航可用，用户点击推送卡片上【开始记忆
+泊车】按键或双击拨杆或语音激活，可进入巡航态。（预留）
+2.3 功能开启异常​
+前置条件​
+系统动作​
+功能异常场景下开启功能，当前停车场/园区未学习
+过路线时​
+进入漫游人驾界面；（不显示学习轨迹线
+的渲染）​
+功能异常场景下开启功能，当前停车场/园区有学习
+过路线且定位成功​
+进库位管理界面，逻辑同记忆泊车​
+具体提示文言和页面如下表：
+触发信号​
+仪表报
+警音效​
+Toast​
+VLA 链路TTS播报​
+（语音指令开启）​
+判断条件​
+PopupDisp=0x
+3   Turn on 
+background 
+functions​
+ ​
+请先打开记忆泊
+车功能开关​
+请先打开记忆泊车功
+能开关​
+车控车设记忆泊车功能
+使能开关为关， ​
+PopupDisp=0x
+5:   HAVP 
+rampway​
+radarfail
+ure.wav​
+请驶离坡道再试​
+请驶离坡道再试​
+坡道大于24%​
+PopupDisp=0x
+6:HAVP   
+Environment 
+empty​
+radarfail
+ure.wav​
+当前环境无法满
+足功能开启条件​
+当前环境无法满足功
+能开启条件​
+非ODD范围内点击开启
+功能​
+PopupDisp=0x
+8:   HAVP 
+camera 
+blocked​
+radarfail
+ure.wav​
+摄像头被遮挡, 记
+忆泊车暂不可用​
+摄像头被遮挡, 记忆泊
+车暂不可用​
+摄像头被遮挡​
+PopupDisp=0x
+9:   HAVP loop 
+camera faulty​
+radarfail
+ure.wav​
+摄像头故障，记
+忆泊车暂不可用​
+摄像头故障，记忆泊
+车暂不可用​
+摄像头故障​
+PopupDisp=0x
+A:   HAVP 
+Radar faulty​
+radarfail
+ure.wav​
+雷达故障，记忆
+泊车暂不可用​
+雷达故障，记忆泊车
+暂不可用​
+雷达故障​
+PopupDisp=0x
+B:   HAVP 
+Associated 
+system faulty​
+radarfail
+ure.wav​
+关联系统故障，
+记忆泊车暂不可
+用​
+关联系统故障，记忆
+泊车暂不可用​
+关联系统故障​
+系统故障​
+
+
+============================================================
+第 7 页
+============================================================
+PopupDisp=0x
+C:   HAVP 
+System faulty​
+radarfail
+ure.wav​
+系统故障，记忆
+泊车暂不可用​
+系统故障，记忆泊车
+暂不可用​
+PopupDisp=0x
+D:   HAVP 
+Door open​
+radarfail
+ure.wav​
+车门打开，记忆
+泊车暂不可用​
+车门打开，记忆泊车
+暂不可用​
+1、在漫游预激活界
+面，toast提示。​
+2、进2D库位管理界
+面，逻辑同记忆泊车​
+PopupDisp=0x
+E:   HAVP Rear 
+door open​
+radarfail
+ure.wav​
+后背门打开，记
+忆泊车暂不可用​
+后背门打开，记忆泊
+车暂不可用​
+1、在漫游预激活界
+面，toast提示。​
+2、进2D库位管理界
+面，逻辑同记忆泊车​
+PopupDisp=0x
+F:   HAVP 
+Safety belt 
+unfastened​
+radarfail
+ure.wav​
+未系安全带，记
+忆泊车暂不可用​
+未系安全带，记忆泊
+车暂不可用​
+1、在漫游预激活界
+面，toast提示。​
+2、进2D库位管理界
+面，逻辑同记忆泊车​
+PopupDisp=0x
+10:   HAVP 
+Engine cover 
+open​
+radarfail
+ure.wav​
+机舱盖打开，记
+忆泊车暂不可用​
+机舱盖打开，记忆泊
+车暂不可用​
+1、在漫游预激活界
+面，toast提示。​
+2、进2D库位管理界
+面，逻辑同记忆泊车​
+PopupDisp=0x
+11:   HAVP 
+RCTB/FCTB 
+activation​
+radarfail
+ure.wav​
+主动安全功能激
+活，记忆泊车暂
+不可用​
+主动安全功能激活，
+记忆泊车暂不可用​
+RCTB/FCTB激活​
+PopupDisp=0x
+12:   HAVP 
+AEB activation​
+radarfail
+ure.wav​
+主动安全功能激
+活，记忆泊车暂
+不可用​
+主动安全功能激活，
+记忆泊车暂不可用​
+AEB激活​
+PopupDisp=0x
+13:   HAVP 
+TCS/ABS 
+activation​
+radarfail
+ure.wav​
+主动安全功能激
+活，记忆泊车暂
+不可用​
+主动安全功能激活，
+记忆泊车暂不可用​
+TCS/ABS激活​
+PopupDisp=0x
+14:   HAVP ESP 
+activation​
+radarfail
+ure.wav​
+主动安全功能激
+活，记忆泊车暂
+不可用​
+主动安全功能激活，
+记忆泊车暂不可用​
+ ESP激活​
+PopupDisp=0x
+15:   HAVP 
+HDC 
+activation​
+radarfail
+ure.wav​
+主动安全功能激
+活，记忆泊车暂
+不可用​
+主动安全功能激活，
+记忆泊车暂不可用​
+HDC激活​
+PopupDisp=0x
+16:   HAVP Tire 
+pressure is 
+too low​
+radarfail
+ure.wav​
+胎压异常，记忆
+泊车暂不可用​
+胎压异常，记忆泊车
+暂不可用​
+胎压异常（不监控了）​
+PopupDisp=0x
+17:   HAVP 
+Illumination 
+conditions​
+radarfail
+ure.wav​
+光照过亮或过
+暗，记忆泊车暂
+不可用​
+光照过亮或过暗，记
+忆泊车暂不可用​
+光照不满足​
+PopupDisp=0x
+18:   HAVP 
+Raining 
+conditions​
+radarfail
+ure.wav​
+雨量过大，记忆
+泊车暂不可用​
+雨量过大，记忆泊车
+暂不可用​
+雨量过大​
+
+
+============================================================
+第 8 页
+============================================================
+PopupDisp=0x
+1B:   Please 
+switch to D 
+gear​
+ ​
+请先挂入D挡​
+请先挂入D挡​
+语音开启漫游或巡航发
+送，N档和R档下播报
+（不控车）​
+PopupDisp=0x
+3B:HAVP   
+Driving Mode 
+not supported
+radarfail
+ure.wav​
+驾驶模式不满
+足，记忆泊车暂
+不可用​
+驾驶模式不满足，记
+忆泊车暂不可用​
+驾驶模式不满足​
+PopupDisp=0x
+3D:HAVP   
+Rearview 
+mirror folded​
+radarfail
+ure.wav​
+后视镜折叠，记
+忆泊车暂不可用​
+后视镜折叠，记忆泊
+车暂不可用​
+1、在漫游预激活界
+面，toast提示。​
+2、进2D库位管理界
+面，逻辑同记忆泊车​
+PopupDisp=0X
+42：HAVP 
+other 
+auxiliary 
+driving   
+functions are 
+activated​
+radarfail
+ure.wav​
+其他辅助驾驶功
+能激活，记忆泊
+车暂不可用​
+其他辅助驾驶功能激
+活，记忆泊车暂不可
+用​
+其他辅助功能激活，收
+到【记忆泊车】点击信
+号​
+PopupDisp=0x
+49:   Not 
+Available in 
+Valet Mode​
+radarfail
+ure.wav​
+代客模式已开
+启，辅助驾驶无
+法激活​
+代客模式已开启，辅
+助驾驶无法激活​
+当收到门童代客模式开
+启​
+PopupDisp=0x
+4C:Trailer_hitc
+h_open_sys_u
+navailable​
+radarfail
+ure.wav​
+已连接挂车，系
+统暂不可用​
+已连接挂车，系统暂
+不可用​
+已连接拖车​
+PopupDisp=0x
+4D:Differential
+_lock_open_s
+ys_unavailabl
+e​
+radarfail
+ure.wav​
+差速锁打开，系
+统暂不可用​
+差速锁打开，系统暂
+不可用​
+后差速锁锁止​
+3. 静默建图​
+静默建图包括无图静默建图，无图漫游泊车，扩建建图和有图漫游泊车。
+3.1 无图静默建图​
+智驾系统后台需根据车辆的行驶轨迹进行实时建图。
+前置条件：用户点击【记忆泊车】按键进入到漫游泊车人驾界面，域控发送信号如下：
+系统动作：
+a. 界面信号：InterfaceDisTyp=0x10:VLAP Preactive（漫游泊车人驾界面）​
+b. 功能状态：FunctWorkSts=0x0:Standby​
+c. 按键信号：FunctBtnDisp=0x0:None​
+d. 【开始记忆泊车】按键信号：StartPrkBtnDisp=0x0:No_Display​
+e. AVM状态请求信号：APS_PASSwtReq=0x2:Request to open（持续发送）​
+f. 状态灯信号：PrkgFuncStsLmp=0x2：VLAP_Roaming_Standby,（CAN信号，状
+态灯只在中控显示）
+
+
+============================================================
+第 9 页
+============================================================
+g. HUT侧需实时渲染感知元素，包括立柱、车位、道路箭头、行人、车辆、减速
+带、学习的轨迹、缩略态map（显示行驶过的道路线，范围100米（TBD），域控
+侧发送全量数据后由HUT侧进行局部展示）、状态灯等。以及功能界面上需显示
+实时车速（HUT侧性能暂时不满足）。​
+3.2 无图漫游泊车​
+前置条件：用户通过语音进入功能或者在预激活界面双击拨杆，系统进入到漫游泊车状
+态，发送具体信号如下：
+系统动作：
+a. 界面信号：InterfaceDisTyp=0x11:VLAP Active（漫游控车界面）​
+b. 功能状态：FunctWorkSts= 0x9:VLAP Roaming或0xA:VLAP Parking或0xB: VLAP 
+Pause（漫游，漫游APA，漫游暂停）​
+c. 按键信号：FunctBtnDisp=0x0:None​
+d. 【开始记忆泊车】按键信号：StartPrkBtnDisp=0x0:No_Display​
+e. AVM状态请求信号：APS_PASSwtReq=0x2:Request to open（持续发送）​
+f. 状态灯信号：PrkgFuncStsLmp= 0x4:VLAP_Roaming_Active,（CAN信号，状态
+灯只在中控显示）
+g. 沿途泊车按键信号：AlongToutPrkgBtnSts=0x1:Available或0x2:Unavailable或
+0x3:Highlight ​
+h. 漫游泊车速度设置反馈信号：VLAPSpdSetVal=0x14:Twenty（支持设置范围：
+10~20km/h）​
+i.
+HUT侧需实时渲染感知元素，包括立柱、车位、道路箭头、行人、车辆、减速
+带、学习的轨迹、局部规划轨迹、缩略态map（显示行驶过的道路线，范围
+TBD，域控侧发送全量数据后由HUT侧进行局部展示）、状态灯、沿途泊车按
+键，COT推理面板等。以及功能界面上需显示实时车速（HUT侧性能暂时不满
+足）。
+备注：漫游泊车速度设置超过10~20km/h范围后，域控发送对应提示（VLA链路）。​
+
+
+============================================================
+第 10 页
+============================================================
+3.3 有图巡航泊车​
+前置条件：车辆进入到有图的停车场/园区​
+触发条件：用户点击【记忆泊车】按键，HUT发送BtnEnaReq= 0x2:Active_signal​
+系统动作：
+1. 按键信号：FunctBtnDisp ==0x0:None（不显示）​
+2. 按键有效性信号：FunctBtnSts ==0x1: Available（可用）​
+3. 界面信号：InterfaceDisTyp=0x1: Pre_Mapbuilt​
+4. 【开始记忆泊车】按键信号：StartPrkBtnDisp==0x1:Available或0x2:Unavailable
+（依据可进入控车状态）
+5. 功能状态：FunctWorkSts== 0x0:Standby​
+6. AVM状态请求信号：APS_PASSwtReq=0x2:Request to open（持续发送）​
+7. 状态灯信号：PrkgFuncStsLmp= 0x3:VLAP_Crusing_Standby,（CAN信号，状态灯
+只在中控显示）
+HUT跳转到2D地图管理界面，界面逻辑同记忆泊车。​
+4. 漫游阶段​
+4.1 漫游抑制（不使能）​
+前置条件：
+1. 四门两盖打开
+2. 安全带解开
+3. 后视镜折叠
+4. 车速>20km/h&&车速<30km/h​
+5. 坡道>24%​
+6. 光照雨量条件不满足
+7. 驾驶模式不满足
+8. 车辆非静止条件（车位内）
+9. 巡航挡位为R、方向盘转角>180°（车位外）​
+系统动作：功能不进Active，维持Standby，HUT界面显示漫游泊车人驾界面
+InterfaceDisTyp =0x10:VLAP Preactive，直至前置条件恢复​
+4.2 漫游激活​
+Zhiyuan Chen 2025年11月20日
+Zhiyuan Chen 2025年11月20日
+丁锐博2025年11月22日
+有图巡航泊车
+瑞博文档叫有图漫游泊车
+这个章节是不是可以放到6.导航
+&巡航
+@Zhiyuan Chen  我修改下，主
+要是写有图场景下信号发送，原
+来和记忆泊车有稍微出入。后来
+合入回记忆泊车了。
+
+
+============================================================
+第 11 页
+============================================================
+漫游泊车过程中，智驾根据用户的指令执行寻找车位或目的地的或无目的地漫游，漫游过
+程支持用户的语音控车指令。（指令见7.语音控车）​
+漫游过程中部分区别于记忆泊车的场景文言提示如下：
+场景​
+文言提示​
+备注​
+车辆自行漫游过程中需调头​
+HAVPFunctTextDisp=0x
+B9​
+ ​
+人驾漫游阶段APA泊入完成​
+HAVPFunctTextDisp=0x
+BA​
+ ​
+车辆自行漫游超10分钟（TBD）​
+HAVPFunctTextDisp=0x
+BB​
+ ​
+车辆自行漫游，但是已在目标楼层​
+HAVPFunctTextDisp=0x
+BC​
+ ​
+有图场景下，车辆漫游到目标楼层，但
+目标楼层无空车位​
+HAVPFunctTextDisp=0x
+BE​
+ ​
+执行漫游找楼层车位逻辑，到达目标楼
+层后进行找车位动作​
+HAVPFunctTextDisp=0x
+C0​
+ ​
+备注：不可激活漫游巡航时，PopupDisp文言和播报如下：​
+触发信号​
+播报文言​
+仪表报警
+音效​
+中控pop up
+（toast文言）​
+场景说明​
+APS_Sys
+SoundIn
+dcn（发
+送五帧）​
+PopupDi
+sp​
+0x5: HAVP   
+rampway​
+　VLA 链路
+TTS播报​
+（语音指令开
+启）​
+0x1：
+parking_u
+navailabl
+e​
+请驶离坡道再
+试​
+坡度过大（＞24%）
+或泊出坡道过大（＞
+15%）​
+0xD: HAVP 
+Door   open​
+　VLA 链路
+TTS播报​
+（语音指令开
+启）​
+0x1：
+parking_u
+navailabl
+e​
+车门打开，系
+统暂不可用​
+车门打开​
+0xE: HAVP 
+Rear   door 
+open​
+　VLA 链路
+TTS播报​
+（语音指令开
+启）​
+0x1：
+parking_u
+navailabl
+e​
+后背门打开，
+系统暂不可用​
+后背面打开​
+0xF: HAVP 
+Safety   belt 
+unfastened​
+　VLA 链路
+TTS播报​
+（语音指令开
+启）​
+0x1：
+parking_u
+navailabl
+e​
+未系安全带，
+系统暂不可用​
+未系安全带​
+0x10: HAVP   
+Engine cover 
+open​
+　VLA 链路
+TTS播报​
+0x1：
+parking_u
+navailabl
+e​
+机舱盖打开，
+系统暂不可用​
+机舱盖打开​
+
+
+============================================================
+第 12 页
+============================================================
+（语音指令开
+启）​
+0x17: HAVP   
+Illumination 
+conditions​
+　VLA 链路
+TTS播报​
+（语音指令开
+启）​
+0x1：
+parking_u
+navailabl
+e​
+光照过亮或过
+暗，系统暂不
+可用​
+光照不满足​
+0x18: HAVP   
+Raining 
+conditions​
+　VLA 链路
+TTS播报​
+（语音指令开
+启）​
+0x1：
+parking_u
+navailabl
+e​
+雨量过大，系
+统暂不可用​
+雨量过大​
+0x1B: Please  
+ switch to D 
+gear​
+请先挂入D挡​
+　​
+请先挂入D挡​
+进巡航，挡位处于R
+档​
+0x3D:HAVP   
+Rearview 
+mirror folded​
+　VLA 链路
+TTS播报​
+（语音指令开
+启）​
+0x1：
+parking_u
+navailabl
+e​
+后视镜折叠，
+系统暂不可用​
+后视镜折叠​
+0x3B:HAVP   
+Driving 
+Mode not 
+supported​
+　VLA 链路
+TTS播报​
+（语音指令开
+启）​
+0x1：
+parking_u
+navailabl
+e​
+驾驶模式不满
+足，系统暂不
+可用​
+驾驶模式不满足​
+4.3 沿途泊车​
+前提条件：InterfaceDisTyp=0x11:VLAP Active Page（漫游控车界面）​
+沿途泊车
+按键信号​
+AlongTo
+utPrkgB
+tnSts​
+0x0:No_Display​
+•
+未激活漫游功能，按键不显示​
+◦
+已处于沿途找车位状态时：包含用户点击或
+语音触发【沿途泊车】后，或漫游找车位时
+已到达目标楼层​
+◦
+漫游暂停状态​
+0x1:Available​
+•
+漫游功能激活且沿途泊车功能可用，按键显示可
+点击态​
+◦
+非沿途找车位状态时；含无目的漫游，找充
+电桩车位，找楼层任务等（当找楼层车位任
+务自车到达目标楼层后，开始找车位的过程
+也算作处于沿途找车位）​
+0x2:Unavailable​
+漫游功能激活且沿途泊车功能异常，按键显示不可点
+击态（预留）​
+触发条件：用户点击【沿途泊车】按键，HUT发送BtnEnaReq=0x10:VLAP parking 
+Nearby给到域控​
+系统动作：域控反馈文言HAVPFunctTextDisp=0xBD:Searching parkspace提示用户（此
+文言在沿途泊车找车位周期内常驻，可被其他文言打断），系统在沿途发现可泊车位后，
+自动切换至泊入过程。同时切换到APA后，HUT需要根据APA功能状态信号：
+APS_Worksts=0x3:Guidence和页面信号InterfaceDisTyp=11:VLAP Active渲染泊车界
+面。​
+
+
+============================================================
+第 13 页
+============================================================
+4.4 漫游暂停&继续​
+前置条件：处于漫游控车界面
+触发条件：用户语音“帮我停车”、"刹停"等​
+系统动作：根据指令控制车辆减速刹停保压
+1. 界面信号：InterfaceDisTyp ==11:VLAP Active​
+2. 功能状态：FunctWorkSts==0xB: VLAP Pause​
+3. 状态灯信号：PrkgFuncStsLmp=0x4:VLAP_Roaming_Active​
+4. 【继续】按键：FunctBtnDisp=0x2:Continue_HAVP ​
+5. 【沿途泊车】按键AlongToutPrkgBtnSts=0x0:No_Display​
+6. 漫游泊车速度设置反馈信号：VLAPSpdSetVal=0​
+用户点击【继续】软按键（HUT发送BtnEnaReq= 0xF: Continue_VLAP）或语音“继续
+漫游”（VLA链路），系统控制车辆继续漫游，HUT根据信号渲染【沿途泊车】按键，取
+消【继续】按键渲染。暂停恢复后，沿途泊车按键状态保持暂停前状态。
+当系统暂停超过3分钟（TBD），系统请求底盘挂P档、拉起EPB，同时域控发送
+HAVPFunctTextDisp=0xB7:Pause overtime_sys_exit，PopupDisp =0x20:take over 
+immediately提示提醒用户接管车辆，功能退出，退回到HUT主界面。​
+4.5 漫游异常退出​
+在漫游过程中，出现下表条件后ADC会退出控车，ADC发送HAVPFunctTextDisp以及
+PopupDisp =0x20: take over immediately至HUT， HUT根据PopupDisp =0x20显
+示”请立即接管“大弹窗且HUT绑定提示音效CruiseTakeOverLV31声（参考行车接管音
+效）。
+域控发出PopupDisp =0x20: take over immediately 3s(TBD)后退回漫游预激活界面或车
+机主界面（依据泊车功能降级表）
+HUT详细文言内容见表格《智驾-（泊车）TTS语音播报-需求输入xx版》​
+泊车功能降级表
+场景说明​
+触发信号​
+HAVPFunctTextDisp​
+退出界面​
+漫游或巡航中，打开机舱盖（包含巡
+航APA机舱盖60秒退出）​
+0x3F: Crusing Engine hood open​
+漫游预激活界
+面​
+HUT主界面​
+漫游或巡航中，打开后背门（包含巡
+航APA后背门60秒退出）​
+0x40: Crusing Trunk open​
+漫游预激活界
+面​
+HUT主界面​
+漫游或巡航中，打开车门（包含巡航
+APA车门60秒退出）​
+0x41: Crusing Door open​
+漫游预激活界
+面​
+HUT主界面​
+漫游或巡航中，关闭外后视镜（包含
+巡航APA外后视镜60秒退出）​
+0x42: Crusing Rearview mirror fold​
+漫游预激活界
+面​
+HUT主界面​
+漫游或巡航中，解开安全带（包含巡
+航APA安全带60秒退出）​
+0x43: Crusing Seat belt loosen​
+漫游预激活界
+面​
+
+
+============================================================
+第 14 页
+============================================================
+HUT主界面​
+漫游或巡航中，绕行障碍物空间不足
+（不可移动障碍物）​
+0x46: Statistic Obstacle 30s​
+漫游预激活界
+面​
+HUT主界面​
+漫游或巡航中，定位失败​
+0x48: Positioning Unsuccessful​
+HUT主界面​
+漫游或巡航中（巡航和巡航APA），
+光照不满足​
+0x49: Crusing Illumination conditions​
+HUT主界面​
+漫游或巡航中（巡航和巡航APA），
+雨量过大​
+0x4A: Crusing Raining conditions​
+HUT主界面​
+漫游或巡航中（巡航和巡航APA和建
+图前界面），系统故障​
+0x4B: Crusing LVP Failure​
+HUT主界面​
+漫游或巡航中（巡航和巡航APA和建
+图前界面），关联系统故障​
+0x4C: Crusing Associated System 
+Failure​
+HUT主界面​
+漫游超过10min(TBD)​
+0x4D: Crusing Time out​
+HUT主界面​
+漫游或巡航中，APA泊车超过4分钟​
+0x4E: Parking Time out​
+HUT主界面​
+漫游或巡航中APA阶段（以泊车APA最
+新暂停次数为准）​
+0x4F: Number of pauses exceeded​
+HUT主界面​
+漫游或巡航中，续航不足（原定纯电
+车型播报，不开发）​
+0x50: Vehicle range too low​
+HUT主界面​
+全功能，RCTB/FCTB激活​
+0x51: Crusing RCTB/FCTB activation​
+HUT主界面​
+全功能，AEB激活​
+0x52: Crusing AEB activation​
+HUT主界面​
+全功能，ESP激活​
+0x53: Crusing ESP activation​
+HUT主界面​
+全功能，TCS/ABS激活​
+0x54: Crusing TCS/ABS activation​
+HUT主界面​
+全功能，HDC激活​
+0x55: Crusing HDC activation​
+HUT主界面​
+漫游或巡航中，胎压异常（先不监
+控）​
+0x56: Tire pressure is too low​
+HUT主界面​
+漫游或巡航中，目标车位被占，并无
+空车位​
+0x57: Target slot occupied. No slot 
+nearby​
+HUT主界面​
+漫游或巡航中，APA泊入失败（踩油
+门超过60s退出、等待超30S、路径规
+划失败等无专属文言失败）​
+0x58: Parkingin_failure​
+HUT主界面​
+收到进功能信号后，未激活成功​
+0x5A: Activation_failed​
+HUT主界面​
+巡航中（包含巡航APA），摄像头被
+遮挡​
+0x5B: Cruising Camera blocked​
+HUT主界面​
+巡航中（包含巡航APA和建图前界
+面），摄像头故障​
+0x5C: Cruising the loop camera faulty​
+HUT主界面​
+巡航中（包含巡航APA和建图前界
+面），雷达故障​
+0x5D: Cruising Radar faulty​
+HUT主界面​
+巡航中（包含巡航APA），EPB干预​
+0x61:Pull up EPB​
+漫游预激活界
+面​
+
+
+============================================================
+第 15 页
+============================================================
+HUT主界面​
+巡航中（包含巡航APA），档位干预​
+0x62:gear intervene​
+漫游预激活界
+面​
+HUT主界面​
+巡航中（包含巡航APA），方向盘干
+预​
+0x63:steering intervene​
+漫游预激活界
+面​
+HUT主界面​
+巡航中，踩刹车​
+0x64:brake intervene​
+漫游预激活界
+面​
+HUT主界面​
+巡航中（包含巡航APA），主动退出​
+0x65: crusing user exit​
+HUT主界面​
+车速超过30KM/H​
+0x67: Crusing Speed too high​
+漫游预激活界
+面​
+HUT主界面​
+系统暂停超过3分钟（TBD）​
+0xB7:Pause overtime_sys_exit​
+HUT主界面​
+车辆自行漫游超10分钟（TBD）​
+0xBB Roaming overtime​
+HUT主界面​
+车辆自行漫游，但是已在目标楼层​
+0xBC:Target Floor is on the current 
+Floor ​
+漫游预激活界
+面​
+HUT主界面​
+车辆自行漫游，但是已在目标区域​
+0xC2:Target Area is on the current 
+Area​
+漫游预激活界
+面​
+HUT主界面​
+4.6 静默&漫游完成​
+前置条件：无图漫游完成且静默建图开关开启
+触发条件：在手动泊入车位后挂P挡或漫游【沿途泊车】自动泊入车位后​
+系统动作：域控发送 HAVPFunctTextDisp =0xBA: Parking in complete 文言 “泊车已完
+成”，PopupDisp=0X3F:HAVP_Push_Request（最长10s  15s），HUT收到后弹窗提示
+用户是否保存地图
+◦
+如果用户选择【保存】，HUT发送BtnEnaReq= 0x3，域控保存地图后发送
+0x4B:Save_Success提示用户保存成功。界面跳转至
+InterfaceDisTyp=0x1:Pre_Mapbuilt库位管理页面​
+◦
+如果用户选择【取消】，HUT侧发送BtnEnaReq= 0x5：Cancel，HUT取消卡片显
+示，同时域控放弃路线保存。界面跳转至HUT主界面。​
+◦
+如果用户10s  15s未点击，10s  15s结束域控自行放弃路线保存。​
+当建图完成并保存后，地图数据更新（显示区域、出入口等信息），界面跳转至
+InterfaceDisTyp=0x1:Pre_Mapbuilt库位管理页面（同记忆泊车学图完成逻辑），【开始
+记忆泊车】按键信号：StartPrkBtnDisp=0x1:Available或0x2:Unavailable等。​
+注：在未建图完成或保存前，点击缩略态map，文言提示“请保存地图后再尝试”。----
+HUT侧逻辑​
+前置条件：有图漫游&静默完成，车辆到达漫游终点并完成后​
+系统动作：域控发送HAVPFunctTextDisp=0xB8:Roaming Completed提示“漫游已完
+成”，3s后退出到HUT主界面。​​
+丁锐博2025年11月22日
+Zhiyuan Chen 2025年11月22日
+Zhiyuan Chen 2025年11月24日
+（同记忆泊车学图完成逻辑）
+不同于记忆泊车学习完成逻辑，
+记忆泊车学习完成跳转为总结页
+面，漫游学习完成跳转为2D 地
+图管理界面
+那导航按键显示吗
+导航按键座舱侧完成
+丁锐博2025年11月22日
+Zhiyuan Chen 2025年11月22日
+导航界面
+补充：2D 地图关界面（和导航
+界面不是同一个coding）
+有图人驾不是这个界面吗
+
+
+============================================================
+第 16 页
+============================================================
+4.7 扩建地图​
+前置条件​
+界面信息​
+功能实现​
+有图停车场人驾驶离
+地图范围外​
+记忆泊车导航界面/2D
+地图界面跳转至漫游泊
+车人驾界面
+InterfaceDisTyp=0x10:
+VLAP Preactive​
+•
+返回地图范围内跳
+转回2D地图管理页
+面
+InterfaceDisTyp=0x
+1: Pre_Mapbuilt​
+•
+园区内，挂P档，小地图更新融合后地图​
+•
+驶出园区，退回主界面，自动更新保存，退
+出到HUT主界面，更新地图后无交互提示用
+户​
+有图停车场漫游驶离
+地图范围外​
+维持漫游控车界面​
+•
+返回地图范围内维
+持漫游泊车控车界
+面​
+备注：
+园区内：挂P档，自动更新保存。​
+1. 如果车辆在原有地图路线外，挂P挡，则维持界面InterfaceDisTyp=0x10，如果用户
+在继续行驶，继续执行扩建地图逻辑。
+2. 如果车辆在2D地图管理页挂P挡，则维持2D地图管理页面（HUT侧可直接显示新地
+图）。 ​
+5. COT推理面板​
+面板显示条件：HUT收到InterfaceDisTyp=0x11:VLAP Active Page且
+FunctWorkSts≠0xA: VLAP Parking后进行渲染。​
+漫游泊车开关打开后，在无图漫游、有图漫游自动显示推理面板；
+面板内容显示接口：
+语音反馈：通过VLAADASCtrlSrv （0x0806）服务中CtrlCmdResultReport接口
+（0x8001）传输相关数据。（交互信号复用行车）。​
+环境推理：通过VLAADASCtrlSrv （0x0806）服务中信号EnvironmentReport传输相关
+数据。（交互信号复用行车）。
+5.1  COT推理面板样式概览​
+面板样式增加环境热力图标标注（针对推理场景），其余同行车COT面板​
+元素​
+内容​
+示意图​
+缩略态​
+精简：场景+横纵控制行为 ​
+新增：注
+意力热力
+图标标注​
+可视化标亮规则：感知通过OCR识别
+指引信息，可视化需框选/扎标重要
+指引信息（楼层、出入口、上下坡）​
+推理文字​
+丁锐博2025年11月27日 （编辑过）
+且FunctWorkSts≠0xA: VLAP Parking
+增加一些判断条件
+Jinchen Zou 2025年12月22日
+FunctWorkSts= 0x9:VLAP Roaming或0x…
+@Chong Cheng  这个状态机里
+面已经加了吗？
+
+
+============================================================
+第 17 页
+============================================================
+当前任务 + 【逗号】）+ 场景+【句
+号】+ 横向决策 +【逗号】+ 纵向决
+策 +【句号】​
+5.2 推理面板显示规则​
+•
+推理显示逻辑 ​
+◦
+FunctWorkSts= 0x9:VLAP Roaming或0xA:VLAP Parking或0xB: VLAP Pause（漫
+游，漫游APA，漫游暂停）下显示推理面板​
+◦
+频率：VLA以1秒2帧方式推给DTA，DTA按5s/次转发给前端显示，使用时间戳来保
+证5秒时间间隔。高优直接推​
+◦
+发生动作变化 ＞ 无动作变化，高优打断低优，同级不打断推送​
+◦
+高优标签：用户语音指令、VLA输出影响横向决策（需求：增加每条推送是否任务
+推理标签：见5.3节）​
+•
+去重逻辑：
+◦
+功能刚激活时不比对上一帧推送内容，默认激活时首帧都推
+◦
+文本重复计算逻辑：通过句号拆分为两段，前面部分是场景，后面部分是控制行
+为。场景通过场景列表比对是否一致，控制行为使用文本比较的方式判断。两者
+有任一变化则发送文本 ​
+◦
+超过30s（TBD）推理内容未更新，则更新一条新的推理内容​
+•
+缩略态
+◦
+座舱对场景与动作字段进行拼合显示，发送具体字段string title=2 详细见下：​
+      message  VLAtext{​
+        int32 id = 1; //cot id​
+        string title=2（场景+动作）​
+PB协议​
+代码块​
+// 域控 to 座舱​
+// VLA推理文本，topic：/gwm/vla_text​
+/*
+SOME/IP
+  Server:ADC
+  ServiceInterfaceName:VLAADASCtrlSrv
+  ElementName:EnvironmentReport
+  DatatypeReferencea:CtrlCmdResultReport_Integer
+*/
+message  VLAtext{
+Zhiyuan Chen 2025年12月22日
+Chong Cheng 2025年12月22日
+Kang Liang 2025年12月22日
+更新：FunctWorkSts=0XA 
+:VLAP Parking 下不显示COT 面
+板
+@Jinchen Zou  有的，内部状
+态机可以和康对一下
+@Kang Liang
+加了
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+
+============================================================
+第 18 页
+============================================================
+  int32 id = 1;
+  string title = 2;
+  string content = 3;
+  repeated string action = 4;
+  bytes image = 5; //（jpeg，YUV422，640*360）​
+  uint64 milliseconds = 6;
+  bool is_VLA_active = 7; //vla active状态​
+}
+5.3 COT场景需求（非最新仅供参考，最新版见文档​
+漫游泊车-产品
+需求形态梳理 2.5.2.1章节）​
+有Proto=有缩略显示；无Proto也可以正常定义COT​
+场景枚举​
+（对应一个枚举值）​
+对应场景​
+（蓝色tag且缩略显示）​
+场景分类​
+普通停车场路段​
+停车场直道​
+直道通行​
+非任务推理​
+停车场弯道​
+弯道通行​
+非任务推理​
+停车场路口​
+前方路口​
+非任务推理​
+断头路​
+前方断头路​
+非任务推理​
+上坡​
+通过坡道，小心通行​
+非任务推理​
+下坡​
+通过坡道，小心通行​
+非任务推理​
+场景推理（需要注意力热力选区）​
+出口指引​
+（有任务）发现出口方向​
+任务推理​
+到达出口​
+（任务完成）已到达停车场出口​
+任务推理​
+楼层指引​
+（有任务）发现楼层指引​
+任务推理​
+当前楼层​
+自车当前在XX楼层​
+任务推理​
+到达目标楼层​
+（任务完成）已到达目标楼层​
+任务推理​
+区域指引​
+（有任务）发现目标区域指引​
+任务推理​
+区域​
+（有任务）到达目标区域​
+任务推理​
+静态障碍物场景​
+减速带​
+前方请减速通行​
+非任务推理​
+障碍物占道（雪糕筒，自行车）​
+注意静止障碍物，减速避让​
+非任务推理​
+闸机关（预留）​
+闸机关闭，等待打开​
+非任务推理​
+闸机开（预留）​
+闸机打开，小心通行​
+非任务推理​
+动态障碍物场景​
+行人横穿（预留）​
+前方行人，小心通行​
+非任务推理​
+会车（预留）​
+前方会车，小心通行​
+非任务推理​
+Zhiyuan Chen 2025年11月27日 月日
+园区出口、园区入口
+元戎：停车场和园区出入口没有
+区分
+11
+12
+13
+14
+15
+16
+17
+18
+19
+
+
+============================================================
+第 19 页
+============================================================
+跟车（预留）​
+跟车行驶​
+非任务推理​
+环境场景​
+积水​
+积水路线，低速通行​
+非任务推理​
+坑洼/龟裂/包凸/颠簸​
+坑洼路段，低速通行​
+非任务推理​
+窄路​
+窄路环境，低速通行​
+非任务推理​
+泥泞​
+泥泞路况，低速行驶​
+非任务推理​
+大雨​
+雨天湿滑，低速行驶​
+非任务推理​
+大雾​
+雾天视野不佳，低速行驶​
+非任务推理​
+沙尘暴​
+沙尘视野不佳，低速行驶​
+非任务推理​
+雪天 | 积雪 | 结冰​
+结冰路况，低速行驶​
+非任务推理​
+6. 导航&巡航​
+导航和巡航阶段整体逻辑同记忆泊车，渲染新增系统识别的POI信息（停车场出口、停车
+场入口、园区出口、园区入口、充电桩车位（车位）），漫游泊车速度设置反馈
+VLAPSpdSetVal。​
+对应巡航过程中状态指示灯显示（只在中控显示）：
+PrkgFuncStsLmp=0x7:HAVP_Standby,匹配到地图，巡航待激活​
+PrkgFuncStsLmp=0x8:HAVP_Active,巡航已激活​
+PrkgFuncStsLmp=0x9:HAVP_Override,巡航中踩油门​
+6.1  巡航完成​
+前置条件：记忆巡航泊入完成或巡航到目标楼层或出口或其它POI点后​
+系统动作：界面跳转到完成页，InterfaceDisTyp=0x5:HAVP_completed,HUT进行文字
+提示,同时显示统计信息界面,以及【退出】按键。​
+•
+用户点击【退出】，HUT发送BtnEnaReq=0x8:HAVP_Completed,域控收到​
+后发送HAP_Hmi_Index=0xl:Main Screen。HUT退回HUT主界面。​
+•
+巡航完成界面，如20秒(TBD)用户无操作域控需主动退至HUT主界面​
+7. 语音控车​
+支持自然语言指令控制泊车过程，总共分为3大类：1、园区功能开启指令；2、行为控制
+指令；3、目的地寻找指令​
+•
+当前支持的语音指令：语音反馈播报见
+VLA漫游泊车指令_202511    ​
+VLA泊车产
+品需求sheet2​
+•
+不支持指令语音反馈：语音反馈播报-----暂不支持该功能，正在学习中​
+8. 功能退出​
+用户主动功能退出和系统退出同记忆泊车。
+计划&待办​
+12.15以太网信号联调（不包含CAN信号：状态灯、车速、DVR水印）​
+1. 12.3 proto新增--​
+Zhiyuan Chen ​
+Yuyao Ye ​
+Hao Yuan ​
+​
+proto | 泊车 vla​
+Zhiyuan Chen 2025年11月27日
+@丁锐博
+Zhiyuan Chen 1月23日 11:52
+VLA泊车产品需求sheet2
+@Qian Wang  语音回复更新，
+同步更新用例
+Jinchen Zou 2025年12月5日
+Zhiyuan Chen 2025年12月5日
+Yuyao Ye 2025年12月5日
+proto新增
+@Zhiyuan Chen  VLA 新增的场
+景proto 更新了吗
+@Hao Yuan  @Yuyao Ye  老板
+们VLA 的proto 有了不
+有了一版，后面可能会调整
+
+
+============================================================
+第 20 页
+============================================================
+2. 12.10 COT面板 ​
+Jinchen Zou ​
+[研发需求（RR）]VLA泊车COT面板​
+3. 12.5 VIZ COT面板​
+Zengrui Meng ​
+4. 12.10 其他显示逻辑 ​
+Kang Liang ​
+[研发需求（RR）]VLA泊车交互界面信号开
+发​
+5. 12.8 测试用例​
+Qian Wang ​
+6. 小蓝灯、DVR水印需求同步​
+Lieping Tang ​
+​
+[研发需求（RR）]Thor-VLA 漫游泊车-新增小蓝灯显示​
+7. viz界面UI设计 ​
+Qian Chen 12.22​
+8. viz界面交互及增加信号 ​
+Zengrui Meng ​
+Kang Liang 12.26​
+9. 实车走查效果
+Zhiyuan Chen 12.27​
+
